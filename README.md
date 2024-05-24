@@ -10,3 +10,6 @@ bad app but it will hopfuly work in the end
 
 ### \[Linux && windows]
   1. good luck
+
+
+# Fork of <a href="https://github.com/element-hq/element-x-ios">element x ios<\a>
