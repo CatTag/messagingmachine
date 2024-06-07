@@ -1,5 +1,5 @@
 # messagingmachine
-this is my app made for my iOS class
+this is my app made for my iOS class,
 bad app but it will hopfuly work in the end
 
 ## **Build guide**:
