@@ -1,0 +1,33 @@
+os: osx
+language: swift
+cache: cocoapods
+install:
+- git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
+- git fetch --unshallow --tags
+before_script:
+- set -o pipefail
+- pod install --repo-update
+script:
+- xcodebuild -workspace Seaglass.xcworkspace -scheme Seaglass archive -archivePath
+  $PWD/build/Seaglass.xcarchive | xcpretty
+- xcodebuild -exportArchive -archivePath $PWD/build/Seaglass.xcarchive -exportOptionsPlist
+  .ci/ExportOptions.plist -exportPath $PWD/build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+before_deploy:
+  - cd build && tar -zcf Seaglass-$(cd $TRAVIS_BUILD_DIR && sh scripts/version.sh).tar.gz Seaglass.app && cd ..
+  - sed -i -e "s/VERSION_NAME_VALUE/$(cd $TRAVIS_BUILD_DIR && sh scripts/version.sh)/g" .ci/bintray-release.json
+  - sed -i -e "s/BINTRAY_USER/$BINTRAY_USER/g" .ci/bintray-release.json
+deploy:
+  - provider: bintray
+    file: .ci/bintray-release.json
+    user: $BINTRAY_USER
+    key:
+      secure: $BINTRAY_TOKEN
+    skip_cleanup: true
+    on: master
+notifications:
+    webhooks:
+        urls:
+            - "$MATRIX_WEBHOOK_URL"
+        on_success: change
+        on_failure: always
+        on_start: never
